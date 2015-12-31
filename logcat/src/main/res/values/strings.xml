@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Logcat</string>
+
+    <string name="auto">Auto</string>
+    <string name="manual">Manual</string>
+    <string name="clear">Clear</string>
+</resources>

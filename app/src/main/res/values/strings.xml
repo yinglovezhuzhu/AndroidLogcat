@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AndroidLogcat</string>
+    <string name="email">By yinglovezhuzhu@gmail.com</string>
+
+    <string name="add_log">Add log</string>
+    <string name="stop_add_log">Stop add log</string>
+</resources>

@@ -1,0 +1,16 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.opensource.logcat">
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:supportsRtl="true">
+        <!-- Logcat -->
+        <activity android:name="com.opensource.logcat.ui.activity.LogcatActivity"
+            android:theme="@style/LogcatActivity"
+            android:configChanges="screenSize|orientation|keyboardHidden"
+            android:launchMode="singleTask" />
+
+    </application>
+
+</manifest>
