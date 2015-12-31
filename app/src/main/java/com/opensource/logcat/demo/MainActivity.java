@@ -27,6 +27,7 @@ import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
 import com.opensource.logcat.Logcat;
+import com.opensource.logcat.SharedPrefHelper;
 
 /**
  * 主页面
@@ -35,6 +36,7 @@ import com.opensource.logcat.Logcat;
 public class MainActivity extends Activity {
 
     private ToggleButton mTBtnAddLog;
+    private SharedPrefHelper mSharedPrefHelper;
     private android.os.Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -58,23 +60,47 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
 
+        mSharedPrefHelper = SharedPrefHelper.newInstance(this, Logcat.SP_LOGCAT_CONFIG);
+
         mTBtnAddLog = (ToggleButton) findViewById(R.id.tbtn_log_toggle);
-        mTBtnAddLog.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked) {
-                    mHandler.sendEmptyMessageDelayed(0, 1000);
-                } else {
-                    mHandler.removeMessages(0);
-                }
-            }
-        });
+        mTBtnAddLog.setOnCheckedChangeListener(mOnCheckedChangeListener);
+
+        ToggleButton tBtnLogcatToggle = (ToggleButton) findViewById(R.id.tbtn_logcat_toggle);
+        tBtnLogcatToggle.setChecked(mSharedPrefHelper.getBoolean("logcat_enabled", false));
+        tBtnLogcatToggle.setOnCheckedChangeListener(mOnCheckedChangeListener);
     }
+
+    private CompoundButton.OnCheckedChangeListener mOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            switch (buttonView.getId()) {
+                case R.id.tbtn_logcat_toggle:
+                    if(isChecked) {
+                        Logcat.enableLogcat(MainActivity.this);
+                    } else {
+                        Logcat.disableLogcat();
+                    }
+                    break;
+                case R.id.tbtn_log_toggle:
+                    if(isChecked) {
+                        mHandler.sendEmptyMessageDelayed(0, 1000);
+                    } else {
+                        mHandler.removeMessages(0);
+                    }
+                    mSharedPrefHelper.saveBoolean("logcat_enabled", isChecked);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onStart() {
         super.onStart();
-        Logcat.enableLogcat(this);
+        if(mSharedPrefHelper.getBoolean("logcat_enabled", false)) {
+            Logcat.enableLogcat(this);
+        }
     }
 
     @Override

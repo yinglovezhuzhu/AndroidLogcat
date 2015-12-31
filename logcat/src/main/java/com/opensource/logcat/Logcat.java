@@ -28,6 +28,7 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -50,6 +51,8 @@ import java.util.List;
  * Created by yinglovezhuzhu@gmail.com on 2015/8/24.
  */
 public class Logcat {
+
+    public static final String SP_LOGCAT_CONFIG = "logcat_config";
 
     /** 关闭logcat **/
     public static final String ACTION_CLOSE_LOGCAT = "com.ghw.sdk.ACTION_CLOSE_LOGCAT";
@@ -128,7 +131,7 @@ public class Logcat {
         mAppContext = context.getApplicationContext();
         mWindowManager = (WindowManager) mAppContext.getSystemService(Context.WINDOW_SERVICE);
 
-        mSharePrefHelper = SharedPrefHelper.newInstance(context.getApplicationContext(), "logcat_config");
+        mSharePrefHelper = SharedPrefHelper.newInstance(context.getApplicationContext(), SP_LOGCAT_CONFIG);
         mLogAutoScroll = mSharePrefHelper.getBoolean(SP_KEY_LOG_AUTO_SCROLL, false);
 
         initLayoutParams();
@@ -169,6 +172,7 @@ public class Logcat {
         }
         if(null != mReadLogThread) {
             mReadLogThread.interrupt();
+            mReadLogThread = null;
         }
     }
 
@@ -352,6 +356,7 @@ public class Logcat {
 //                    process = Runtime.getRuntime().exec("logcat -v time");
                 process = new ProcessBuilder()
                         .command("logcat", "-v", "time", "|", "grep", String.valueOf(android.os.Process.myPid()))
+//                        .command("logcat", "-v", "time")
                         .redirectErrorStream(true)
                         .start();
                 final InputStream is = process.getInputStream();
@@ -419,7 +424,9 @@ public class Logcat {
                         .command("logcat", "-c")
                         .redirectErrorStream(true)
                         .start();
-            } catch (IOException e) {
+                int exitValue = process.waitFor();
+                Log.d("AndroidLogcat", "Clear log-->>>>" + exitValue);
+            } catch (IOException|InterruptedException e) {
                 e.printStackTrace();
             } finally {
                 if(null != process) {

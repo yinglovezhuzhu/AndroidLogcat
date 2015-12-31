@@ -22,4 +22,6 @@
 
     <string name="add_log">Add log</string>
     <string name="stop_add_log">Stop add log</string>
+    <string name="enable_logcat">Enable logcat</string>
+    <string name="disable_logcat">Disable logcat</string>
 </resources>
