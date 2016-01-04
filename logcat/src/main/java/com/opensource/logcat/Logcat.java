@@ -28,12 +28,12 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.opensource.logcat.observer.LogObservable;
 import com.opensource.logcat.observer.LogObserver;
@@ -70,7 +70,7 @@ public class Logcat {
 
     private Context mAppContext;
     private WindowManager mWindowManager;
-    private Button mBtnLog;
+    private ImageButton mIBtnLog;
     private WindowManager.LayoutParams mBtnLayoutParams;
 
     private final LogcatHandler mHandler = new LogcatHandler(Looper.getMainLooper());
@@ -151,7 +151,7 @@ public class Logcat {
         initialize(activity);
 
         try {
-            mWindowManager.addView(mBtnLog, mBtnLayoutParams);
+            mWindowManager.addView(mIBtnLog, mBtnLayoutParams);
         } catch (Exception e) {
             // do nothing
         }
@@ -162,9 +162,9 @@ public class Logcat {
 
     void disableLogcatWindow() {
         if(null != mWindowManager) {
-            if(null != mBtnLog) {
+            if(null != mIBtnLog) {
                 try {
-                    mWindowManager.removeView(mBtnLog);
+                    mWindowManager.removeView(mIBtnLog);
                 } catch (Exception e) {
                     // do nothing
                 }
@@ -270,15 +270,17 @@ public class Logcat {
      * @param context
      */
     private void initLogButton(Context context) {
-        mBtnLog = new Button(context);
-        mBtnLog.setText("LOG");
-        mBtnLog.setOnClickListener(new View.OnClickListener() {
+        mIBtnLog = new ImageButton(context);
+        mIBtnLog.setBackgroundResource(context.getResources().getIdentifier("selector_entry_button", "drawable", context.getPackageName()));
+        mIBtnLog.setImageResource(context.getResources().getIdentifier("ic_entry", "drawable", context.getPackageName()));
+        mIBtnLog.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        mIBtnLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showLog();
             }
         });
-        mBtnLog.setOnTouchListener(new View.OnTouchListener() {
+        mIBtnLog.setOnTouchListener(new View.OnTouchListener() {
 
             float startX = 0f;
             float startY = 0f;
@@ -298,7 +300,7 @@ public class Logcat {
                             downX = event.getX();
                             downY = event.getY();
                             Rect rect = new Rect();
-                            mBtnLog.getWindowVisibleDisplayFrame(rect);
+                            mIBtnLog.getWindowVisibleDisplayFrame(rect);
                             statusBarHeight = rect.top;
 
                             start = true;
@@ -310,7 +312,7 @@ public class Logcat {
                             }
                             mBtnLayoutParams.x = (int) (event.getRawX() - downX);
                             mBtnLayoutParams.y = (int) (event.getRawY() - downY - statusBarHeight);
-                            mWindowManager.updateViewLayout(mBtnLog, mBtnLayoutParams);
+                            mWindowManager.updateViewLayout(mIBtnLog, mBtnLayoutParams);
                             mSharePrefHelper.saveInt(SP_KEY_FLOW_BUTTON_X, mBtnLayoutParams.x);
                             mSharePrefHelper.saveInt(SP_KEY_FLOW_BUTTON_Y, mBtnLayoutParams.y);
                             return true;
@@ -332,8 +334,10 @@ public class Logcat {
     private void initLayoutParams() {
         mBtnLayoutParams = new WindowManager.LayoutParams();
         mBtnLayoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
-        mBtnLayoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
-        mBtnLayoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+//        mBtnLayoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+//        mBtnLayoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        mBtnLayoutParams.width = 80;
+        mBtnLayoutParams.height = 80;
         mBtnLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         mBtnLayoutParams.format = PixelFormat.RGBA_8888;
         mBtnLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
@@ -357,6 +361,7 @@ public class Logcat {
                 process = new ProcessBuilder()
                         .command("logcat", "-v", "time", "|", "grep", String.valueOf(android.os.Process.myPid()))
 //                        .command("logcat", "-v", "time")
+//                        .command("logcat", "-v", "time", "-b", "events")
                         .redirectErrorStream(true)
                         .start();
                 final InputStream is = process.getInputStream();
@@ -424,8 +429,7 @@ public class Logcat {
                         .command("logcat", "-c")
                         .redirectErrorStream(true)
                         .start();
-                int exitValue = process.waitFor();
-                Log.d("AndroidLogcat", "Clear log-->>>>" + exitValue);
+                process.waitFor();
             } catch (IOException|InterruptedException e) {
                 e.printStackTrace();
             } finally {

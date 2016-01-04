@@ -80,6 +80,7 @@ public class MainActivity extends Activity {
                     } else {
                         Logcat.disableLogcat();
                     }
+                    mSharedPrefHelper.saveBoolean("logcat_enabled", isChecked);
                     break;
                 case R.id.tbtn_log_toggle:
                     if(isChecked) {
@@ -87,7 +88,6 @@ public class MainActivity extends Activity {
                     } else {
                         mHandler.removeMessages(0);
                     }
-                    mSharedPrefHelper.saveBoolean("logcat_enabled", isChecked);
                     break;
                 default:
                     break;
