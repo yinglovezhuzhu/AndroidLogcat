@@ -95,17 +95,20 @@ public class MainActivity extends Activity {
         }
     };
 
+
     @Override
     protected void onStart() {
         super.onStart();
+
         if(mSharedPrefHelper.getBoolean("logcat_enabled", false)) {
-            Logcat.enableLogcat(this);
+            Logcat.enableLogcat(MainActivity.this);
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+
         Logcat.disableLogcat();
     }
 }

@@ -124,20 +124,20 @@ public class Logcat {
         }
     }
 
-    void initialize(Context context) {
+    void initialize(Activity activity) {
         if(mInitialized) {
             return;
         }
-        mAppContext = context.getApplicationContext();
-        mWindowManager = (WindowManager) mAppContext.getSystemService(Context.WINDOW_SERVICE);
+        mWindowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
 
-        mSharePrefHelper = SharedPrefHelper.newInstance(context.getApplicationContext(), SP_LOGCAT_CONFIG);
+        mSharePrefHelper = SharedPrefHelper.newInstance(activity.getApplicationContext(), SP_LOGCAT_CONFIG);
         mLogAutoScroll = mSharePrefHelper.getBoolean(SP_KEY_LOG_AUTO_SCROLL, false);
 
-        initLayoutParams();
+        initLayoutParams(activity);
 
-        initLogButton(mAppContext);
+        initLogButton(activity);
 
+        mAppContext = activity.getApplicationContext();
         LocalReceiver receiver = new LocalReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_LOGCAT_CLOSED);
@@ -331,13 +331,13 @@ public class Logcat {
 
     }
 
-    private void initLayoutParams() {
+    private void initLayoutParams(Activity activity) {
         mBtnLayoutParams = new WindowManager.LayoutParams();
-        mBtnLayoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+        mBtnLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL;
 //        mBtnLayoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
 //        mBtnLayoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        mBtnLayoutParams.width = 80;
-        mBtnLayoutParams.height = 80;
+        mBtnLayoutParams.width = 120;
+        mBtnLayoutParams.height = 120;
         mBtnLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         mBtnLayoutParams.format = PixelFormat.RGBA_8888;
         mBtnLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
